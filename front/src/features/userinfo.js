@@ -18,8 +18,6 @@ export const { actions, reducer } = createSlice({
 	reducers: {
 		storeUser: (draft, action) => {
 			if (draft.status === "pending" || draft.status === "updating") {
-				// on passe en resolved et on sauvegarde les données
-
 				draft.firstName = action.payload.firstName;
 				draft.lastName = action.payload.lastName;
 				draft.userName = action.payload.userName;
@@ -30,30 +28,25 @@ export const { actions, reducer } = createSlice({
 		},
 		fetching: (draft) => {
 			if (draft.status === "void") {
-				// on passe en pending
 				draft.status = "pending";
 				return;
 			}
-			// si le statut est rejected
+
 			if (draft.status === "rejected") {
-				// on supprime l'erreur et on passe en pending
 				draft.error = null;
 				draft.status = "pending";
 				return;
 			}
-			// si le statut est resolved
+
 			if (draft.status === "resolved") {
-				// on passe en updating (requête en cours mais des données sont déjà présentent)
 				draft.status = "updating";
 				return;
 			}
-			// sinon l'action est ignorée
+
 			return;
 		},
 		rejected: (draft, action) => {
-			// si la requête est en cours
 			if (draft.status === "pending" || draft.status === "updating") {
-				// on passe en rejected, on sauvegarde l'erreur et on supprime les données
 				draft.status = "rejected";
 				draft.error = action.payload;
 				draft.firstName = "";
@@ -64,18 +57,18 @@ export const { actions, reducer } = createSlice({
 					"";
 				return;
 			}
-			// sinon l'action est ignorée
+
 			return;
 		},
 	},
 });
 
-export const { storeUser,fetching,rejected } = actions;
+export const { storeUser, fetching, rejected } = actions;
 export default reducer;
 
 export function fetchUser() {
 	return async (dispatch, getState) => {
-		const status = selectUserInfo(getState()).status
+		const status = selectUserInfo(getState()).status;
 		const token = getState().log.token;
 		const auth = `Bearer ${token}`;
 		const bodys = {
@@ -86,7 +79,6 @@ export function fetchUser() {
 			},
 		};
 		if (status === "pending" || status === "updating") {
-			// on stop la fonction pour éviter de récupérer plusieurs fois la même donnée
 			return;
 		}
 		dispatch(fetching());
@@ -97,7 +89,6 @@ export function fetchUser() {
 			);
 			const temp = await response.json();
 			if (temp.status !== 200) {
-				
 				throw new Error(JSON.stringify(temp));
 			}
 			const info = temp.body;
@@ -105,14 +96,14 @@ export function fetchUser() {
 			window.localStorage.setItem("username", info.userName);
 			sessionStorage.setItem("username", info.userName);
 		} catch (error) {
-			const err = JSON.parse(error.message)
+			const err = JSON.parse(error.message);
 			dispatch(rejected(err));
 		}
 	};
 }
 export function newUsername(action) {
 	return async (dispatch, getState) => {
-		const status = selectUserInfo(getState()).status
+		const status = selectUserInfo(getState()).status;
 		const payloadbody = { userName: action };
 		console.log(payloadbody);
 		const token = getState().log.token;
@@ -126,7 +117,6 @@ export function newUsername(action) {
 			body: JSON.stringify(payloadbody),
 		};
 		if (status === "pending" || status === "updating") {
-			// on stop la fonction pour éviter de récupérer plusieurs fois la même donnée
 			return;
 		}
 		dispatch(fetching());
@@ -141,7 +131,7 @@ export function newUsername(action) {
 			window.localStorage.setItem("username", info.userName);
 			sessionStorage.setItem("username", info.userName);
 		} catch (error) {
-			const err = JSON.parse(error.message)
+			const err = JSON.parse(error.message);
 			dispatch(rejected(err));
 		}
 	};

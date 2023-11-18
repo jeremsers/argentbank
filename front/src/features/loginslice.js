@@ -14,7 +14,6 @@ export const { actions, reducer } = createSlice({
 	reducers: {
 		updateToken: (draft, action) => {
 			if (draft.status === "pending" || draft.status === "updating") {
-				// on passe en resolved et on sauvegarde les données
 				draft.token = action.payload;
 
 				draft.status = "resolved";
@@ -24,36 +23,31 @@ export const { actions, reducer } = createSlice({
 		},
 		fetching: (draft) => {
 			if (draft.status === "void") {
-				// on passe en pending
 				draft.status = "pending";
 				return;
 			}
-			// si le statut est rejected
+
 			if (draft.status === "rejected") {
-				// on supprime l'erreur et on passe en pending
 				draft.error = null;
 				draft.status = "pending";
 				return;
 			}
-			// si le statut est resolved
+
 			if (draft.status === "resolved") {
-				// on passe en updating (requête en cours mais des données sont déjà présentent)
 				draft.status = "updating";
 				return;
 			}
-			// sinon l'action est ignorée
+
 			return;
 		},
 		rejected: (draft, action) => {
-			// si la requête est en cours
 			if (draft.status === "pending" || draft.status === "updating") {
-				// on passe en rejected, on sauvegarde l'erreur et on supprime les données
 				draft.status = "rejected";
 				draft.error = action.payload;
 				draft.token = 0;
 				return;
 			}
-			// sinon l'action est ignorée
+
 			return;
 		},
 	},
@@ -77,7 +71,6 @@ export function fetchToken(pl) {
 		};
 
 		if (status === "pending" || status === "updating") {
-			// on stop la fonction pour éviter de récupérer plusieurs fois la même donnée
 			return;
 		}
 		dispatch(fetching());
@@ -88,7 +81,6 @@ export function fetchToken(pl) {
 			);
 			const temp = await response.json();
 			if (temp.status !== 200) {
-				
 				throw new Error(JSON.stringify(temp));
 			}
 			const tok = temp.body.token;
@@ -99,9 +91,8 @@ export function fetchToken(pl) {
 
 			dispatch(updateToken(tok));
 		} catch (error) {
-			
-			const err = JSON.parse(error.message)
-			
+			const err = JSON.parse(error.message);
+
 			dispatch(rejected(err));
 		}
 	};
