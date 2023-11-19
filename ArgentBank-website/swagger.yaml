@@ -120,7 +120,7 @@ paths:
      description: No user found for this token
     "500":
      description: Internal Server Error
- /user/accounts/{accountid}/transactions:
+ /user/accounts/{accountId}/transactions:
   post:
    security:
     - Bearer: []
@@ -129,12 +129,13 @@ paths:
    summary: User transactions API
    description: API for fetching all transactions for a specific account
    parameters:
-    - in: body
-      name: body
-      description: Fetch user transactions for a specific account
+    - in: path
+      name: accountId
       required: true
-      schema:
-       $ref: "#/definitions/UserAccount"
+      description : unique account identifier
+      type: integer
+      
+    
    produces:
     - application/json
    responses:
@@ -157,6 +158,17 @@ paths:
    summary: Modify note or category
    description: API for updating a specific transaction
    parameters:
+    - in: path
+      name: accountId
+      required: true
+      description : unique account identifier
+      type: integer
+    - in: path
+      name: transactionId
+      required: true
+      description : unique transaction identifier
+      type: integer
+      
     - in: body
       name: body
       description: modify note or category associated to a specific transaction
@@ -185,12 +197,16 @@ paths:
    summary: Delete note
    description: API for deleting note of a specific transaction
    parameters:
-    - in: body
-      name: body
-      description: delete note associated to a specific transaction
+    - in: path
+      name: accountId
       required: true
-      schema:
-       $ref: "#/definitions/UserTransaction"
+      description : unique account identifier
+      type: integer
+    - in: path
+      name: transactionId
+      required: true
+      description : unique transaction identifier
+      type: integer
    produces:
     - application/json
    responses:
@@ -235,6 +251,7 @@ definitions:
    password:
     type: string
     description: user password
+
  ApiResponse:
   type: object
   properties:
@@ -259,27 +276,9 @@ definitions:
   properties:
    userName:
     type: string
- UserAccount:
-  type: object
-  properties:
-   accountId:
-    type: integer
- UserTransaction:
-  type: object
-  properties:
-   accountId:
-    type: integer
-   transactionId:
-    type: integer
-   date:
-    type: string
  UserModifyTransaction:
   type: object
   properties:
-   accountId:
-    type: integer
-   transactionId:
-    type: integer
    category:
     type: integer
    note:

@@ -126,6 +126,9 @@ export function newUsername(action) {
 				bodys
 			);
 			const temp = await response.json();
+			if (temp.status !== 200) {
+				throw new Error(JSON.stringify(temp));
+			}
 			const info = temp.body;
 			dispatch(storeUser(info));
 			window.localStorage.setItem("username", info.userName);
